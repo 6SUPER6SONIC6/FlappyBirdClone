@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.Random;
@@ -32,15 +34,18 @@ public class FlappyBirdClone extends ApplicationAdapter {
 	float distanceBetweenTubes;
 
 	Circle birdHitBox;
-	ShapeRenderer shapeRenderer;
+	Rectangle[] tobTubeHitBoxes;
+	Rectangle[] bottomTubeHitBoxes;
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		background = new Texture("background.png");
 
+
 		birdHitBox = new Circle();
-		shapeRenderer = new ShapeRenderer();
+		tobTubeHitBoxes = new Rectangle[tubesNumber];
+		bottomTubeHitBoxes = new Rectangle[tubesNumber];
 
 		bird = new Texture[2];
 		bird[0] = new Texture("bird_wings_up.png");
@@ -58,6 +63,9 @@ public class FlappyBirdClone extends ApplicationAdapter {
 			tubeX[i] = Gdx.graphics.getWidth() / 2 - topTube.getWidth() /2 + i * distanceBetweenTubes;
 			tubeShift[i] = (random.nextFloat() - 0.5f) *
 					(Gdx.graphics.getHeight() - spaceBetweenTubes - 700);
+
+			tobTubeHitBoxes[i] = new Rectangle();
+			bottomTubeHitBoxes[i] = new Rectangle();
 
 		}
 
@@ -105,6 +113,14 @@ public class FlappyBirdClone extends ApplicationAdapter {
 					Gdx.graphics.getHeight() / 2 + spaceBetweenTubes / 2 + tubeShift[i]);
 			batch.draw(bottomTube, tubeX[i],
 					Gdx.graphics.getHeight() / 2 - spaceBetweenTubes / 2 - bottomTube.getHeight() + tubeShift[i]);
+
+			tobTubeHitBoxes[i] = new Rectangle(tubeX[i],
+					Gdx.graphics.getHeight() / 2 + spaceBetweenTubes / 2 + tubeShift[i],
+					topTube.getWidth(), topTube.getHeight());
+
+			bottomTubeHitBoxes[i] = new Rectangle(tubeX[i],
+					Gdx.graphics.getHeight() / 2 - spaceBetweenTubes / 2 - bottomTube.getHeight() + tubeShift[i],
+					bottomTube.getWidth(), bottomTube.getHeight());
 		}
 
 
@@ -121,10 +137,13 @@ public class FlappyBirdClone extends ApplicationAdapter {
 
 		birdHitBox.set(Gdx.graphics.getWidth() / 2, flyHeight + bird[birdStateFlag].getHeight() / 2,
 				bird[birdStateFlag].getWidth() / 2);
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		shapeRenderer.setColor(Color.GREEN);
-		shapeRenderer.circle(birdHitBox.x, birdHitBox.y, birdHitBox.radius);
-		shapeRenderer.end();
+
+		for (int i = 0; i < tubesNumber; i++) {
+
+			if (Intersector.overlaps(birdHitBox, tobTubeHitBoxes[i]) || Intersector.overlaps(birdHitBox, bottomTubeHitBoxes[i])){
+				Gdx.app.log("Intersected", "Bump");
+			}
+		}
 	}
 	
 	@Override
