@@ -2,8 +2,11 @@ package com.supersonic.flappybirdclone;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.Random;
@@ -28,10 +31,17 @@ public class FlappyBirdClone extends ApplicationAdapter {
 	float tubeShift[] = new	float[tubesNumber];
 	float distanceBetweenTubes;
 
+	Circle birdHitBox;
+	ShapeRenderer shapeRenderer;
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		background = new Texture("background.png");
+
+		birdHitBox = new Circle();
+		shapeRenderer = new ShapeRenderer();
+
 		bird = new Texture[2];
 		bird[0] = new Texture("bird_wings_up.png");
 		bird[1] = new Texture("bird_wings_down.png");
@@ -50,6 +60,7 @@ public class FlappyBirdClone extends ApplicationAdapter {
 					(Gdx.graphics.getHeight() - spaceBetweenTubes - 700);
 
 		}
+
 
 	}
 
@@ -104,9 +115,16 @@ public class FlappyBirdClone extends ApplicationAdapter {
 		}
 
 
-		batch.draw(bird[birdStateFlag], Gdx.graphics.getWidth() / 2 - bird[birdStateFlag].getWidth() /2,
+		batch.draw(bird[birdStateFlag], Gdx.graphics.getWidth() / 2 - bird[birdStateFlag].getWidth() / 2,
 				flyHeight);
 		batch.end();
+
+		birdHitBox.set(Gdx.graphics.getWidth() / 2, flyHeight + bird[birdStateFlag].getHeight() / 2,
+				bird[birdStateFlag].getWidth() / 2);
+		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+		shapeRenderer.setColor(Color.GREEN);
+		shapeRenderer.circle(birdHitBox.x, birdHitBox.y, birdHitBox.radius);
+		shapeRenderer.end();
 	}
 	
 	@Override
